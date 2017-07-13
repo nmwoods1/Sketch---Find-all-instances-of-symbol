@@ -53,8 +53,7 @@ var onRun = function (context) {
 	if (alert.runModal() == "1000") {
 		// doc.currentView().centerRect(theLayer.rect());
 		
-		doc.setCurrentPage(pagesWithSymbol[alert.viewAtIndex(0).indexOfSelectedItem()]);
-		doc.currentPage().deselectAllLayers();
+		doc.setCurrentPage(pagesWithSymbol[alert.viewAtIndex(0).indexOfSelectedItem()]);		
 		selectAllSymbols(doc.currentPage(), masterSymbol);
 	}
 
@@ -70,22 +69,26 @@ var onRun = function (context) {
 	}
 
 	function selectAllSymbols(page, masterSymbol) {
-		var artboards = page.layers();
+
+		var layersToSelect = NSMutableArray.array();
+		
+		var artboards = page.artboards();
 		for (var j = 0; j < artboards.length; j++){
 			var layers = artboards.objectAtIndex(j).layers();
 			for (var i = 0; i < layers.length; i++) {
 		      var layer = layers.objectAtIndex(i);
 		      if (layer instanceof MSSymbolInstance) {
-		      	if (layer.isInstanceForMaster(masterSymbol)) {
-			  		layer.select_byExpandingSelection(true, true)
+		      	if (layer.isInstanceForMaster(masterSymbol)) {		      					  		
+			  		layersToSelect.addObject(layer);
 			  	}
 			  } else if (layer instanceof MSSymbolMaster) {
 			  	if (layer.name().isEqualToString(masterSymbol.name())) {
-			  		layer.select_byExpandingSelection(true, true)
+			  		layersToSelect.addObject(layer);
 			  	}
 			  }
 
 		    }
-		}
+		}		
+		page.changeSelectionBySelectingLayers(layersToSelect);	
 	}
 }
